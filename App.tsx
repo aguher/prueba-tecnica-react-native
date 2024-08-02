@@ -30,8 +30,6 @@ const App = () => {
   const initBooks = async () => {
     setLoading(true);
     try {
-      console.log('Fetching books');
-
       const response = await fetch('https://anapioficeandfire.com/api/books');
       const data = await response.json();
 
@@ -69,8 +67,11 @@ const App = () => {
     });
   };
 
-  const renderBookItem = ({item}) => (
-    <TouchableOpacity onPress={() => handleBook(item)} style={styles.bookItem}>
+  const renderBookItem = ({item, isRecent}) => (
+    <TouchableOpacity
+      testID={`${item.isbn}-${isRecent ? 'recent' : 'no-recent'}`}
+      onPress={() => handleBook(item)}
+      style={styles.bookItem}>
       <Image
         source={{
           uri: `https://covers.openlibrary.org/b/isbn/${item.isbn}-M.jpg`,
@@ -101,25 +102,27 @@ const App = () => {
         ) : (
           booksData().map((book, index) => {
             return (
-              <View key={book.publisher}>
+              <View key={book.isbn}>
                 {index === 0 && (
-                  <View>
+                  <View key={index}>
                     <Text style={styles.sectionTotal}>
                       Libros: {booksData().length}
                     </Text>
                     {recentBooks.size > 0 && (
-                      <View>
+                      <View key={`${book.released}-recent`}>
                         <Text style={styles.sectionHeader}>Recientes</Text>
                         {Array.from(recentBooks).map(url => {
                           const book = books.find(book => book.url === url);
-                          return book ? renderBookItem({item: book}) : null;
+                          return book
+                            ? renderBookItem({item: book, isRecent: true})
+                            : null;
                         })}
                         <Text style={styles.sectionHeader}>Libros</Text>
                       </View>
                     )}
                   </View>
                 )}
-                {renderBookItem({item: book})}
+                {renderBookItem({item: book, isRecent: false})}
               </View>
             );
           })
