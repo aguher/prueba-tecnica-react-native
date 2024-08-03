@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {debounce} from 'lodash';
-import {useCallback, useState} from 'react';
+import {useState} from 'react';
 import {StyleSheet, TextInput} from 'react-native';
 
 interface InputSearchProps {
@@ -14,15 +13,7 @@ export const InputSearch = ({onChangeText, placeholder}: InputSearchProps) => {
   const onChange = (value: string) => {
     setSearchQuery(value);
     onChangeText(value);
-    debouncedSearch(value);
   };
-
-  const debouncedSearch = useCallback(
-    debounce(query => {
-      onChangeText(query);
-    }, 500),
-    [],
-  );
 
   return (
     <TextInput
