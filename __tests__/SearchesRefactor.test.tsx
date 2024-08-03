@@ -1,6 +1,6 @@
 import React from 'react';
 import {fireEvent, render, screen} from '@testing-library/react-native';
-import App from '../App';
+import App from '../src/App';
 import {ReactTestInstance} from 'react-test-renderer';
 const ISBN = '978-0553103540-no-recent';
 describe(App, () => {

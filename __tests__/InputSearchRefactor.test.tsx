@@ -1,6 +1,11 @@
 import React from 'react';
-import {fireEvent, render, screen} from '@testing-library/react-native';
-import App from '../App';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
+import App from '../src/App';
 import {ReactTestInstance} from 'react-test-renderer';
 
 describe(App, () => {
@@ -18,23 +23,23 @@ describe(App, () => {
     render(<App />);
     inputNode = screen.getByPlaceholderText('Buscar');
     expect(inputNode.props.value).toBe('');
-
     fireEvent.changeText(inputNode, textToSearch);
+    await waitFor(() => {
+      expect(inputNode.props.value).toBe(textToSearch);
+    });
+    const loadingNode = screen.getByTestId('loading');
 
-    expect(inputNode.props.value).toBe(textToSearch);
+    expect(loadingNode).toBeOnTheScreen();
 
     const dataText = await screen.findByText(/Libros: 1/i, {exact: false});
     expect(dataText).toBeOnTheScreen();
-
-    //expect(mockOnSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('Should write not match value and show nothing on list', async () => {
     const textToSearch = 'Sample';
 
     render(<App />);
-    inputNode = screen.getByPlaceholderText('Buscar');
-
+    inputNode = screen.getByTestId('input-search');
     fireEvent.changeText(inputNode, textToSearch);
 
     try {

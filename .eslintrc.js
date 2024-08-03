@@ -8,4 +8,7 @@ module.exports = {
       extends: ['plugin:testing-library/react'],
     },
   ],
+  rules: {
+    'react/react-in-jsx-scope': 'off',
+  },
 };

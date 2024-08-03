@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Image,
   ActivityIndicator,
@@ -12,6 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import lodash from 'lodash';
+import {InputSearch} from './ui/components/InputSearch/InputSearch';
 
 const App = () => {
   const [books, setBooks] = useState<[]>([]);
@@ -21,7 +21,6 @@ const App = () => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [recentBooks, setRecentBooks] = useState<Set<string>>(new Set());
   const [selectedBook, setSelectedBook] = useState(null);
-
   useEffect(() => {
     initBooks();
   }, []);
@@ -32,7 +31,6 @@ const App = () => {
     try {
       const response = await fetch('https://anapioficeandfire.com/api/books');
       const data = await response.json();
-
       setBooks(data);
       setError(null);
     } catch (error) {
@@ -41,12 +39,15 @@ const App = () => {
       setLoading(false);
     }
   };
-
   const booksData = () => {
     return lodash.filter(books, b =>
       lodash.includes(lodash.toLower(b.name), lodash.toLower(searchQuery)),
     );
   };
+
+  useEffect(() => {
+    booksData();
+  }, [searchQuery]);
 
   // Presiona un libro
   const handleBook = bk => {
@@ -82,21 +83,15 @@ const App = () => {
       {favorites.has(item.url) && <Text style={styles.favoriteIcon}>★</Text>}
     </TouchableOpacity>
   );
-
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView style={styles.container}>
-        <TextInput
-          placeholder="Buscar"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={styles.searchInput}
-        />
+        <InputSearch placeholder="Buscar" onChangeText={setSearchQuery} />
         <TouchableOpacity onPress={initBooks} style={styles.searchButton}>
           <Text>Actualizar libros</Text>
         </TouchableOpacity>
         {loading ? (
-          <ActivityIndicator size="large" />
+          <ActivityIndicator testID="loading" size="large" />
         ) : error ? (
           <Text style={styles.errorText}>{error}</Text>
         ) : (
@@ -170,12 +165,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
-  },
-  searchInput: {
-    borderColor: '#ddd',
-    borderWidth: 1,
-    padding: 8,
-    marginBottom: 8,
   },
   searchButton: {
     backgroundColor: 'transparent',
