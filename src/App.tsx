@@ -11,7 +11,9 @@ import {
   ScrollView,
 } from 'react-native';
 import lodash from 'lodash';
+
 import {InputSearch} from './ui/components/InputSearch/InputSearch';
+import {UpdateBooks} from './ui/components/UpdateBooks/UpdateBooks';
 
 const App = () => {
   const [books, setBooks] = useState<[]>([]);
@@ -87,9 +89,7 @@ const App = () => {
     <SafeAreaView style={{flex: 1}}>
       <ScrollView style={styles.container}>
         <InputSearch placeholder="Buscar" onChangeText={setSearchQuery} />
-        <TouchableOpacity onPress={initBooks} style={styles.searchButton}>
-          <Text>Actualizar libros</Text>
-        </TouchableOpacity>
+        <UpdateBooks onUpdate={initBooks} />
         {loading ? (
           <ActivityIndicator testID="loading" size="large" />
         ) : error ? (
@@ -166,12 +166,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
-  searchButton: {
-    backgroundColor: 'transparent',
-    padding: 10,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+
   errorText: {
     color: 'red',
     textAlign: 'center',
