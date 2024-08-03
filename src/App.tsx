@@ -2,21 +2,20 @@ import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
   SafeAreaView,
-  Linking,
   ScrollView,
 } from 'react-native';
 import lodash from 'lodash';
-import {BookCard, InputSearch, UpdateBooks} from '@components/index';
+import {
+  BookCard,
+  BookDetail,
+  InputSearch,
+  UpdateBooks,
+} from '@components/index';
 import {Book} from '@core/Book';
 
-interface IRenderBookItem {
-  item: Book;
-  isRecent: boolean;
-}
 const App = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -73,16 +72,6 @@ const App = () => {
     });
   };
 
-  const renderBookItem = ({item, isRecent}: IRenderBookItem) => {
-    return (
-      <BookCard
-        book={item}
-        isRecent={isRecent}
-        handleBook={handleBook}
-        isFavorite={favorites.has(item.url)}
-      />
-    );
-  };
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView style={styles.container}>
@@ -108,51 +97,39 @@ const App = () => {
                           const bookItem = books.find(
                             (inner: Book) => inner.url === url,
                           );
-                          return bookItem
-                            ? renderBookItem({item: bookItem, isRecent: true})
-                            : null;
+                          return bookItem ? (
+                            <BookCard
+                              key={`${bookItem.isbn}-recent`}
+                              book={bookItem}
+                              isRecent
+                              handleBook={handleBook}
+                              isFavorite={favorites.has(bookItem.url)}
+                            />
+                          ) : null;
                         })}
                         <Text style={styles.sectionHeader}>Libros</Text>
                       </View>
                     )}
                   </View>
                 )}
-                {renderBookItem({item: book, isRecent: false})}
+                <BookCard
+                  key={book.isbn}
+                  book={book}
+                  isRecent={false}
+                  handleBook={handleBook}
+                  isFavorite={favorites.has(book.url)}
+                />
               </View>
             );
           })
         )}
         {selectedBook && (
-          <View style={styles.bookDetail}>
-            <Text style={styles.bookDetailTitle}>{selectedBook.name}</Text>
-            <Text>Autor: {selectedBook.authors.join(', ')}</Text>
-            <Text>Editorial: {selectedBook.publisher}</Text>
-            <Text>Número de páginas: {selectedBook.numberOfPages}</Text>
-            <Text>Año de publicación: {selectedBook.released}</Text>
-            <TouchableOpacity
-              onPress={() => handleFavorite(selectedBook)}
-              style={styles.favoriteButton}>
-              <Text>
-                {favorites.has(selectedBook.url)
-                  ? 'Quitar de favoritos'
-                  : 'Agregar a favoritos'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setSelectedBook(null)}
-              style={styles.closeButton}>
-              <Text>Cerrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                Linking.canOpenURL(selectedBook.url).then(() => {
-                  Linking.openURL(selectedBook.url);
-                });
-              }}
-              style={styles.urlButton}>
-              <Text>Abrir API en el navegador</Text>
-            </TouchableOpacity>
-          </View>
+          <BookDetail
+            handleFavorite={handleFavorite}
+            onClose={() => setSelectedBook(null)}
+            selectedBook={selectedBook}
+            isFavorite={favorites.has(selectedBook.url)}
+          />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -184,37 +161,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  bookDetail: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  bookDetailTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  favoriteButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  closeButton: {
-    backgroundColor: '#ccc',
-    padding: 10,
-    alignItems: 'center',
-  },
-  urlButton: {
-    backgroundColor: '#02874a',
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 10,
   },
 });
 
