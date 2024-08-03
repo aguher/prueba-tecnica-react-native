@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
   StyleSheet,
   SafeAreaView,
@@ -11,18 +10,21 @@ import {
   ScrollView,
 } from 'react-native';
 import lodash from 'lodash';
+import {BookCard, InputSearch, UpdateBooks} from '@components/index';
+import {Book} from '@core/Book';
 
-import {InputSearch} from './ui/components/InputSearch/InputSearch';
-import {UpdateBooks} from './ui/components/UpdateBooks/UpdateBooks';
-
+interface IRenderBookItem {
+  item: Book;
+  isRecent: boolean;
+}
 const App = () => {
-  const [books, setBooks] = useState<[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [recentBooks, setRecentBooks] = useState<Set<string>>(new Set());
-  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   useEffect(() => {
     initBooks();
   }, []);
@@ -35,7 +37,7 @@ const App = () => {
       const data = await response.json();
       setBooks(data);
       setError(null);
-    } catch (error) {
+    } catch (_) {
       setError('Error fetching books');
     } finally {
       setLoading(false);
@@ -49,16 +51,17 @@ const App = () => {
 
   useEffect(() => {
     booksData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   // Presiona un libro
-  const handleBook = bk => {
+  const handleBook = (bk: Book) => {
     setSelectedBook(bk);
     setRecentBooks(prev => new Set(prev).add(bk.url));
   };
 
   // Presiona el botón de favoritos
-  const handleFavorite = b => {
+  const handleFavorite = (b: Book) => {
     setFavorites(prev => {
       const newFavorites = new Set(prev);
       if (newFavorites.has(b.url)) {
@@ -70,23 +73,18 @@ const App = () => {
     });
   };
 
-  const renderBookItem = ({item, isRecent}) => (
-    <TouchableOpacity
-      testID={`${item.isbn}-${isRecent ? 'recent' : 'no-recent'}`}
-      onPress={() => handleBook(item)}
-      style={styles.bookItem}>
-      <Image
-        source={{
-          uri: `https://covers.openlibrary.org/b/isbn/${item.isbn}-M.jpg`,
-        }}
-        style={styles.bookImage}
+  const renderBookItem = ({item, isRecent}: IRenderBookItem) => {
+    return (
+      <BookCard
+        book={item}
+        isRecent={isRecent}
+        handleBook={handleBook}
+        isFavorite={favorites.has(item.url)}
       />
-      <Text style={styles.bookTitle}>{item.name}</Text>
-      {favorites.has(item.url) && <Text style={styles.favoriteIcon}>★</Text>}
-    </TouchableOpacity>
-  );
+    );
+  };
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={styles.main}>
       <ScrollView style={styles.container}>
         <InputSearch placeholder="Buscar" onChangeText={setSearchQuery} />
         <UpdateBooks onUpdate={initBooks} />
@@ -95,7 +93,7 @@ const App = () => {
         ) : error ? (
           <Text style={styles.errorText}>{error}</Text>
         ) : (
-          booksData().map((book, index) => {
+          booksData().map((book: Book, index) => {
             return (
               <View key={book.isbn}>
                 {index === 0 && (
@@ -107,9 +105,11 @@ const App = () => {
                       <View key={`${book.released}-recent`}>
                         <Text style={styles.sectionHeader}>Recientes</Text>
                         {Array.from(recentBooks).map(url => {
-                          const book = books.find(book => book.url === url);
-                          return book
-                            ? renderBookItem({item: book, isRecent: true})
+                          const bookItem = books.find(
+                            (inner: Book) => inner.url === url,
+                          );
+                          return bookItem
+                            ? renderBookItem({item: bookItem, isRecent: true})
                             : null;
                         })}
                         <Text style={styles.sectionHeader}>Libros</Text>
@@ -161,6 +161,9 @@ const App = () => {
 
 // Estilos
 const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -171,25 +174,7 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
   },
-  bookItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  bookImage: {
-    width: 50,
-    height: 50,
-    marginRight: 10,
-  },
-  bookTitle: {
-    fontSize: 16,
-  },
-  favoriteIcon: {
-    marginLeft: 'auto',
-    color: 'gold',
-  },
+
   sectionHeader: {
     fontSize: 18,
     fontWeight: 'bold',

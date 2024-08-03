@@ -59,10 +59,31 @@ describe(App, () => {
     fireEvent.press(element);
     await screen.findByText(/Autor: George R. R. Martin/i);
 
-    const closeButton = screen.getByText('Agregar a favoritos');
-    fireEvent.press(closeButton);
+    const addFavoritesBtn = screen.getByText('Agregar a favoritos');
+    fireEvent.press(addFavoritesBtn);
     const removeFavorites = screen.getByText('Quitar de favoritos');
     expect(removeFavorites).toBeOnTheScreen();
+  });
+
+  it('Should add to favorites and show in the list', async () => {
+    const textToSearch = 'A Game of Thrones';
+
+    render(<App />);
+    inputNode = screen.getByPlaceholderText('Buscar');
+
+    fireEvent.changeText(inputNode, textToSearch);
+    const dataText = await screen.findByText(/Libros: 1/i, {exact: false});
+    expect(dataText).toBeOnTheScreen();
+    const element = screen.getByTestId(ISBN);
+    fireEvent.press(element);
+    await screen.findByText(/Autor: George R. R. Martin/i);
+
+    const addFavoritesBtn = screen.getByText('Agregar a favoritos');
+    fireEvent.press(addFavoritesBtn);
+    const closeButton = screen.getByText('Cerrar');
+    fireEvent.press(closeButton);
+    const favoriteIcons = screen.getByTestId('favorite-icon');
+    expect(favoriteIcons).toBeOnTheScreen();
   });
 
   it('Should show button to open API', async () => {

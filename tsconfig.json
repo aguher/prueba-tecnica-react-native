@@ -5,7 +5,8 @@
     "baseUrl": "./src",
     "paths": {
       "@components/*": ["ui/components/*"],
-      "@core/*": ["core/*"]
+      "@core/*": ["core/*"],
+      "@testUtils/*": ["../__tests__/utils/*"]
     }
   }
 }
