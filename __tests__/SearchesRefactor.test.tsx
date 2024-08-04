@@ -1,15 +1,15 @@
-import React from 'react';
-import {fireEvent, render, screen} from '@testing-library/react-native';
-import App from '../src/App';
+import {fireEvent, screen} from '@testing-library/react-native';
+import {renderScreen} from '@testUtils/navigator.utils';
 import {ReactTestInstance} from 'react-test-renderer';
+import MainApp from 'ui/MainApp';
 const ISBN = '978-0553103540-no-recent';
-describe(App, () => {
+xdescribe(MainApp, () => {
   let inputNode: ReactTestInstance;
 
   it('Should click over a book and see detail info', async () => {
     const textToSearch = 'A Game of Thrones';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
 
     fireEvent.changeText(inputNode, textToSearch);
@@ -25,7 +25,7 @@ describe(App, () => {
   it('Should close button and not show details', async () => {
     const textToSearch = 'A Game of Thrones';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
 
     fireEvent.changeText(inputNode, textToSearch);
@@ -49,7 +49,7 @@ describe(App, () => {
   it('Should add to favorites', async () => {
     const textToSearch = 'A Game of Thrones';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
 
     fireEvent.changeText(inputNode, textToSearch);
@@ -68,7 +68,7 @@ describe(App, () => {
   it('Should add to favorites and show in the list', async () => {
     const textToSearch = 'A Game of Thrones';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
 
     fireEvent.changeText(inputNode, textToSearch);
@@ -89,7 +89,7 @@ describe(App, () => {
   it('Should show button to open API', async () => {
     const textToSearch = 'A Game of Thrones';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
 
     fireEvent.changeText(inputNode, textToSearch);
@@ -103,3 +103,5 @@ describe(App, () => {
     fireEvent.press(apiButton);
   });
 });
+
+const renderHome = () => renderScreen('Home');

@@ -6,7 +6,7 @@ import {Detail} from '@screens/detail';
 
 export type NavigationParams = {
   Home: undefined;
-  Detail: {book: Book; isFavorite: boolean};
+  Detail: {book: Book};
 };
 export type RouteName = keyof NavigationParams;
 

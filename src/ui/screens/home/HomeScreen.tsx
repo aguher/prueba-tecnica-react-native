@@ -5,17 +5,16 @@ import {Book} from '@core/Book';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useBooks} from 'ui/contexts/BooksContext';
 import {NavigationOptions} from 'ui/navigation/routes';
 
 interface HomeScreenProps {
   isLoading: boolean;
-  error: string | null;
+  error: unknown;
   refreshBooks: () => void;
   handleBook: (book: Book) => void;
-  handleFavorite: (book: Book) => void;
-  data: Book[];
-  recentBooks: Set<string>;
-  favorites: Set<string>;
+  data: Book[] | undefined;
+  recentBooks: Book[];
   onSearchQuery: (query: string) => void;
 }
 
@@ -26,9 +25,11 @@ export default function HomeScreen({
   refreshBooks,
   recentBooks,
   handleBook,
-  favorites,
+
   onSearchQuery,
 }: HomeScreenProps) {
+  const {isFavorite} = useBooks();
+
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView style={styles.container}>
@@ -37,8 +38,9 @@ export default function HomeScreen({
         {isLoading ? (
           <ActivityIndicator testID="loading" size="large" />
         ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={styles.errorText}>{error as string}</Text>
         ) : (
+          data &&
           data.map((book: Book, index: number) => {
             return (
               <View key={book.isbn}>
@@ -47,12 +49,12 @@ export default function HomeScreen({
                     <Text style={styles.sectionTotal}>
                       Libros: {data.length}
                     </Text>
-                    {recentBooks.size > 0 && (
+                    {recentBooks.length > 0 && (
                       <View key={`${book.released}-recent`}>
                         <Text style={styles.sectionHeader}>Recientes</Text>
-                        {Array.from(recentBooks).map(url => {
+                        {recentBooks.map(item => {
                           const bookItem = data.find(
-                            (inner: Book) => inner.url === url,
+                            (inner: Book) => inner.isbn === item.isbn,
                           );
                           return bookItem ? (
                             <BookCard
@@ -60,7 +62,7 @@ export default function HomeScreen({
                               book={bookItem}
                               isRecent
                               handleBook={handleBook}
-                              isFavorite={favorites.has(bookItem.url)}
+                              isFavorite={isFavorite(bookItem)}
                             />
                           ) : null;
                         })}
@@ -74,7 +76,7 @@ export default function HomeScreen({
                   book={book}
                   isRecent={false}
                   handleBook={handleBook}
-                  isFavorite={favorites.has(book.url)}
+                  isFavorite={isFavorite(book)}
                 />
               </View>
             );

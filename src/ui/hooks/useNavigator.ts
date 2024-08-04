@@ -8,7 +8,6 @@ export const useNavigator = () => {
 
   return {
     goToHome: () => navigation.replace('Home'),
-    goToDetail: (book: Book, isFavorite: boolean) =>
-      navigation.navigate('Detail', {book, isFavorite}),
+    goToDetail: (book: Book) => navigation.navigate('Detail', {book}),
   };
 };

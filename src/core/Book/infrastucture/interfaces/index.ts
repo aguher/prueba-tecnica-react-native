@@ -1,4 +1,4 @@
-export interface Book {
+export interface ApiBook {
   url: string;
   name: string;
   isbn: string;
@@ -10,13 +10,4 @@ export interface Book {
   released: string;
   characters: string[];
   povCharacters: string[];
-}
-
-export interface BookDetail {
-  name: string;
-  authors: string[];
-  numberOfPages: number;
-  publisher: string;
-  released: string;
-  isFavorite: boolean;
 }

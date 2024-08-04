@@ -1,18 +1,12 @@
-import React from 'react';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react-native';
-import App from '../src/App';
+import {fireEvent, screen, waitFor} from '@testing-library/react-native';
 import {ReactTestInstance} from 'react-test-renderer';
+import {renderScreen} from '@testUtils/navigator.utils';
 
-describe(App, () => {
+describe('Home', () => {
   let inputNode: ReactTestInstance;
 
   it('Should exists input to search', async () => {
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
     expect(inputNode).toBeOnTheScreen();
   });
@@ -20,7 +14,7 @@ describe(App, () => {
   it('Should write in input text and wait one element', async () => {
     const textToSearch = 'A Game of Thrones';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByPlaceholderText('Buscar');
     expect(inputNode.props.value).toBe('');
     fireEvent.changeText(inputNode, textToSearch);
@@ -38,7 +32,7 @@ describe(App, () => {
   it('Should write not match value and show nothing on list', async () => {
     const textToSearch = 'Sample';
 
-    render(<App />);
+    renderHome();
     inputNode = screen.getByTestId('input-search');
     fireEvent.changeText(inputNode, textToSearch);
 
@@ -50,3 +44,5 @@ describe(App, () => {
     }
   });
 });
+
+const renderHome = () => renderScreen('Home');
