@@ -15,6 +15,7 @@ import {
   UpdateBooks,
 } from '@components/index';
 import {Book} from '@core/Book';
+import {NavigationContainer} from '@react-navigation/native';
 
 const App = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -73,66 +74,68 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={styles.main}>
-      <ScrollView style={styles.container}>
-        <InputSearch placeholder="Buscar" onChangeText={setSearchQuery} />
-        <UpdateBooks onUpdate={initBooks} />
-        {loading ? (
-          <ActivityIndicator testID="loading" size="large" />
-        ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : (
-          booksData().map((book: Book, index) => {
-            return (
-              <View key={book.isbn}>
-                {index === 0 && (
-                  <View key={index}>
-                    <Text style={styles.sectionTotal}>
-                      Libros: {booksData().length}
-                    </Text>
-                    {recentBooks.size > 0 && (
-                      <View key={`${book.released}-recent`}>
-                        <Text style={styles.sectionHeader}>Recientes</Text>
-                        {Array.from(recentBooks).map(url => {
-                          const bookItem = books.find(
-                            (inner: Book) => inner.url === url,
-                          );
-                          return bookItem ? (
-                            <BookCard
-                              key={`${bookItem.isbn}-recent`}
-                              book={bookItem}
-                              isRecent
-                              handleBook={handleBook}
-                              isFavorite={favorites.has(bookItem.url)}
-                            />
-                          ) : null;
-                        })}
-                        <Text style={styles.sectionHeader}>Libros</Text>
-                      </View>
-                    )}
-                  </View>
-                )}
-                <BookCard
-                  key={book.isbn}
-                  book={book}
-                  isRecent={false}
-                  handleBook={handleBook}
-                  isFavorite={favorites.has(book.url)}
-                />
-              </View>
-            );
-          })
-        )}
-        {selectedBook && (
-          <BookDetail
-            handleFavorite={handleFavorite}
-            onClose={() => setSelectedBook(null)}
-            selectedBook={selectedBook}
-            isFavorite={favorites.has(selectedBook.url)}
-          />
-        )}
-      </ScrollView>
-    </SafeAreaView>
+    <NavigationContainer>
+      <SafeAreaView style={styles.main}>
+        <ScrollView style={styles.container}>
+          <InputSearch placeholder="Buscar" onChangeText={setSearchQuery} />
+          <UpdateBooks onUpdate={initBooks} />
+          {loading ? (
+            <ActivityIndicator testID="loading" size="large" />
+          ) : error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : (
+            booksData().map((book: Book, index) => {
+              return (
+                <View key={book.isbn}>
+                  {index === 0 && (
+                    <View key={index}>
+                      <Text style={styles.sectionTotal}>
+                        Libros: {booksData().length}
+                      </Text>
+                      {recentBooks.size > 0 && (
+                        <View key={`${book.released}-recent`}>
+                          <Text style={styles.sectionHeader}>Recientes</Text>
+                          {Array.from(recentBooks).map(url => {
+                            const bookItem = books.find(
+                              (inner: Book) => inner.url === url,
+                            );
+                            return bookItem ? (
+                              <BookCard
+                                key={`${bookItem.isbn}-recent`}
+                                book={bookItem}
+                                isRecent
+                                handleBook={handleBook}
+                                isFavorite={favorites.has(bookItem.url)}
+                              />
+                            ) : null;
+                          })}
+                          <Text style={styles.sectionHeader}>Libros</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                  <BookCard
+                    key={book.isbn}
+                    book={book}
+                    isRecent={false}
+                    handleBook={handleBook}
+                    isFavorite={favorites.has(book.url)}
+                  />
+                </View>
+              );
+            })
+          )}
+          {selectedBook && (
+            <BookDetail
+              handleFavorite={handleFavorite}
+              onClose={() => setSelectedBook(null)}
+              selectedBook={selectedBook}
+              isFavorite={favorites.has(selectedBook.url)}
+            />
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </NavigationContainer>
   );
 };
 
