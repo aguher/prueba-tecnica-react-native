@@ -8,8 +8,8 @@ interface MainAppProps {}
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      cacheTime: 1000 * 3600, //1 hour of cache
-      staleTime: 1000 * 3600, //1 hour of stale
+      cacheTime: 5000, //5 seconds cache
+      staleTime: 5000, //5 seconds stale
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       refetchInterval: false,

@@ -7,6 +7,8 @@ interface BooksState {
   addRecent: (book: Book) => void;
   toggleFavorites: (book: Book) => void;
   isFavorite: (book: Book) => boolean;
+  isSortingAsc: boolean;
+  onSort: () => void;
 }
 
 export const BooksContext = createContext<BooksState>({
@@ -15,12 +17,14 @@ export const BooksContext = createContext<BooksState>({
   addRecent: () => {},
   toggleFavorites: () => {},
   isFavorite: () => false,
+  isSortingAsc: false,
+  onSort: () => {},
 });
 
 export const BooksProvider = ({children}: {children: ReactNode}) => {
   const [recents, setRecents] = useState<Book[]>([]);
   const [favorites, setFavorites] = useState<Book[]>([]);
-
+  const [isSortingAsc, setIsSortingAsc] = useState(true);
   const addRecent = (book: Book) => {
     if (!recents.some(recent => recent.isbn === book.isbn)) {
       setRecents([...recents, book]);
@@ -35,6 +39,10 @@ export const BooksProvider = ({children}: {children: ReactNode}) => {
     return favorites.some(favorite => favorite.isbn === book.isbn);
   };
 
+  const onSort = () => {
+    setIsSortingAsc(!isSortingAsc);
+  };
+
   return (
     <BooksContext.Provider
       value={{
@@ -43,6 +51,8 @@ export const BooksProvider = ({children}: {children: ReactNode}) => {
         addRecent,
         toggleFavorites,
         isFavorite,
+        isSortingAsc,
+        onSort,
       }}>
       {children}
     </BooksContext.Provider>

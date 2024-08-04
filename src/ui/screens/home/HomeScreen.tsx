@@ -1,7 +1,9 @@
 import {BookCard} from '@components/BookCard';
 import {InputSearch} from '@components/InputSearch';
+import {SortByName} from '@components/SortByName';
 import {UpdateBooks} from '@components/UpdateBooks';
 import {Book} from '@core/Book';
+import {useEffect} from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -25,23 +27,38 @@ export default function HomeScreen({
   refreshBooks,
   recentBooks,
   handleBook,
-
   onSearchQuery,
 }: HomeScreenProps) {
-  const {isFavorite} = useBooks();
+  const {isFavorite, isSortingAsc, onSort} = useBooks();
+
+  useEffect(() => {}, [isSortingAsc]);
+
+  const sortingData = () => {
+    if (!data || data.length === 0) {
+      return [];
+    }
+    return [...data].sort((a, b) => {
+      const compareResult = a.name.localeCompare(b.name);
+      return isSortingAsc ? compareResult : -compareResult;
+    });
+  };
 
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView style={styles.container}>
         <InputSearch placeholder="Buscar" onChangeText={onSearchQuery} />
-        <UpdateBooks onUpdate={refreshBooks} />
+        <View style={styles.column}>
+          <UpdateBooks onUpdate={refreshBooks} />
+          <SortByName isAsc={isSortingAsc} onSort={onSort} />
+        </View>
         {isLoading ? (
           <ActivityIndicator testID="loading" size="large" />
         ) : error ? (
           <Text style={styles.errorText}>{error as string}</Text>
+        ) : !data || data?.length === 0 ? (
+          <Text style={styles.errorText}>No hay valores</Text>
         ) : (
-          data &&
-          data.map((book: Book, index: number) => {
+          sortingData().map((book: Book, index: number) => {
             return (
               <View key={book.isbn}>
                 {index === 0 && (
@@ -96,7 +113,13 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
-
+  column: {
+    flex: 1,
+    flexDirection: 'row',
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   errorText: {
     color: 'red',
     textAlign: 'center',
