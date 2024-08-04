@@ -1,5 +1,7 @@
 import {Book} from '@core/Book';
-import {createContext, ReactNode, useContext, useState} from 'react';
+import {booksStorage, typeOrder} from '@core/Book/infrastucture/booksStorage';
+import {isUndefined} from 'lodash';
+import {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 
 interface BooksState {
   recents: Book[];
@@ -7,7 +9,7 @@ interface BooksState {
   addRecent: (book: Book) => void;
   toggleFavorites: (book: Book) => void;
   isFavorite: (book: Book) => boolean;
-  isSortingAsc: boolean;
+  isSortingAsc: boolean | undefined;
   onSort: () => void;
 }
 
@@ -24,7 +26,22 @@ export const BooksContext = createContext<BooksState>({
 export const BooksProvider = ({children}: {children: ReactNode}) => {
   const [recents, setRecents] = useState<Book[]>([]);
   const [favorites, setFavorites] = useState<Book[]>([]);
-  const [isSortingAsc, setIsSortingAsc] = useState(true);
+  const [isSortingAsc, setIsSortingAsc] = useState<boolean | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    const checkOrder = async () => {
+      const order = await booksStorage.getOrder();
+      if (order === typeOrder.ASCENDING) {
+        setIsSortingAsc(true);
+      } else if (order === typeOrder.DESCENDING) {
+        setIsSortingAsc(false);
+      }
+    };
+
+    checkOrder();
+  }, []);
   const addRecent = (book: Book) => {
     if (!recents.some(recent => recent.isbn === book.isbn)) {
       setRecents([...recents, book]);
@@ -39,8 +56,10 @@ export const BooksProvider = ({children}: {children: ReactNode}) => {
     return favorites.some(favorite => favorite.isbn === book.isbn);
   };
 
-  const onSort = () => {
-    setIsSortingAsc(!isSortingAsc);
+  const onSort = async () => {
+    const sort = isUndefined(isSortingAsc) ? true : isSortingAsc ? false : true;
+    setIsSortingAsc(sort);
+    booksStorage.setOrder(sort);
   };
 
   return (
