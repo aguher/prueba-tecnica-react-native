@@ -32,6 +32,7 @@ El objetivo de esta prueba es evaluar tus habilidades en React Native y tu capac
    - Al usar typescript, hemos añadido toda clase de interfaces, tanto para la conexion a la API como para los Props de los componentes, de esta manera, nos evitamos testing, ya que fallaria en el IDE.
    - Se ha añadido un StackNavigator, en lugar de renderizar todas las capas en el mismo lugar.
    - Se ha integrado en las llamadas React-Query, nos permite cachear las llamadas (mas rapidez) y nos ahorramos mucha logica en las llamadas (Estados de carga, error, etc)
+   - Se ha añadido husky para mejorar los commits a git, de este modo, si fallan los test, no se subira al repositorio.
 
 3. **Compatibilidad con Android e iOS:**
 
