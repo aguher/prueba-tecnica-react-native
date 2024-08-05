@@ -3,7 +3,7 @@ import {booksStorage, typeOrder} from '@core/Book/infrastucture/booksStorage';
 import {isUndefined} from 'lodash';
 import {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 
-interface BooksState {
+export interface BooksState {
   recents: Book[];
   favorites: Book[];
   addRecent: (book: Book) => void;
@@ -29,7 +29,6 @@ export const BooksProvider = ({children}: {children: ReactNode}) => {
   const [isSortingAsc, setIsSortingAsc] = useState<boolean | undefined>(
     undefined,
   );
-
   useEffect(() => {
     const checkOrder = async () => {
       const order = await booksStorage.getOrder();

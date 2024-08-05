@@ -1,11 +1,12 @@
 /* eslint-disable testing-library/no-unnecessary-act */
-import {fireEvent, screen} from '@testing-library/react-native';
+import {fireEvent, screen, waitFor} from '@testing-library/react-native';
 import {ReactTestInstance} from 'react-test-renderer';
 import {act} from '@testing-library/react-native';
 
-import {renderScreen} from '@testUtils/navigator.utils';
+import {renderScreenContext} from '@testUtils/navigator.utils';
+import {BOOK_MOCKED} from '@testUtils/mocked';
 
-xdescribe('Recents', () => {
+describe('Recents', () => {
   let inputNode: ReactTestInstance;
 
   it('Should check recents list', async () => {
@@ -22,10 +23,21 @@ xdescribe('Recents', () => {
       fireEvent.press(element);
       const closeButton = screen.getByText('Cerrar');
       fireEvent.press(closeButton);
-      /* const recentsText = screen.getByTestId('978-0553103540-recent');
-      expect(recentsText).toBeOnTheScreen(); */
+      await waitFor(() => {
+        const recentsText = screen.getByTestId('978-0553103540-recent');
+        expect(recentsText).toBeOnTheScreen();
+      });
     });
   });
 });
 
-const renderHome = () => renderScreen('Home');
+const renderHome = () =>
+  renderScreenContext('Home', {
+    recents: [BOOK_MOCKED],
+    favorites: [],
+    addRecent: () => {},
+    toggleFavorites: () => {},
+    isFavorite: _ => true,
+    isSortingAsc: true,
+    onSort: () => {},
+  });
