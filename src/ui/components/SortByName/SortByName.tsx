@@ -17,8 +17,7 @@ export const SortByName = ({isAsc, onSort}: SortByNameProps) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: 'transparent',
-    padding: 10,
     alignItems: 'center',
-    marginBottom: 16,
+    height: 20,
   },
 });

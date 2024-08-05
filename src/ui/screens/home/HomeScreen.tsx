@@ -1,12 +1,14 @@
-import {BookCard} from '@components/BookCard';
-import {InputSearch} from '@components/InputSearch';
-import {SortByName} from '@components/SortByName';
-import {UpdateBooks} from '@components/UpdateBooks';
-import {Book} from '@core/Book';
 import {useEffect} from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {
+  BookList,
+  InputSearch,
+  SortByName,
+  UpdateBooks,
+} from '@components/index';
+import {Book} from '@core/Book';
 import {useBooks} from 'ui/contexts/BooksContext';
 import {NavigationOptions} from 'ui/navigation/routes';
 
@@ -29,7 +31,7 @@ export default function HomeScreen({
   handleBook,
   onSearchQuery,
 }: HomeScreenProps) {
-  const {isFavorite, isSortingAsc, onSort} = useBooks();
+  const {isSortingAsc, onSort} = useBooks();
 
   useEffect(() => {}, [isSortingAsc]);
 
@@ -44,69 +46,55 @@ export default function HomeScreen({
   };
 
   return (
-    <SafeAreaView style={styles.main}>
-      <ScrollView style={styles.container}>
-        <InputSearch placeholder="Buscar" onChangeText={onSearchQuery} />
-        <View style={styles.column}>
-          <UpdateBooks onUpdate={refreshBooks} />
-          <SortByName isAsc={isSortingAsc} onSort={onSort} />
+    <SafeAreaView style={styles.flex1}>
+      <View style={styles.container}>
+        <View style={styles.row}>
+          <InputSearch placeholder="Buscar" onChangeText={onSearchQuery} />
+          <View style={styles.column}>
+            <UpdateBooks onUpdate={refreshBooks} />
+            <SortByName isAsc={isSortingAsc} onSort={onSort} />
+          </View>
         </View>
-        {isLoading ? (
-          <ActivityIndicator testID="loading" size="large" />
-        ) : error ? (
-          <Text style={styles.errorText}>{error as string}</Text>
-        ) : !data || data?.length === 0 ? (
-          <Text style={styles.errorText}>No hay valores</Text>
-        ) : (
-          sortingData().map((book: Book, index: number) => {
-            return (
-              <View key={book.isbn}>
-                {index === 0 && (
-                  <View key={index}>
-                    <Text style={styles.sectionTotal}>
-                      Libros: {data.length}
-                    </Text>
-                    {recentBooks.length > 0 && (
-                      <View key={`${book.released}-recent`}>
-                        <Text style={styles.sectionHeader}>Recientes</Text>
-                        {recentBooks.map(item => {
-                          const bookItem = data.find(
-                            (inner: Book) => inner.isbn === item.isbn,
-                          );
-                          return bookItem ? (
-                            <BookCard
-                              key={`${bookItem.isbn}-recent`}
-                              book={bookItem}
-                              isRecent
-                              handleBook={handleBook}
-                              isFavorite={isFavorite(bookItem)}
-                            />
-                          ) : null;
-                        })}
-                        <Text style={styles.sectionHeader}>Libros</Text>
-                      </View>
-                    )}
-                  </View>
-                )}
-                <BookCard
-                  key={book.isbn}
-                  book={book}
-                  isRecent={false}
-                  handleBook={handleBook}
-                  isFavorite={isFavorite(book)}
-                />
+        <View style={styles.flex1}>
+          {isLoading ? (
+            <ActivityIndicator testID="loading" size="large" />
+          ) : error ? (
+            <Text style={styles.errorText}>{error as string}</Text>
+          ) : !data || data?.length === 0 ? (
+            <Text style={styles.errorText}>No hay valores</Text>
+          ) : (
+            <>
+              <View>
+                <Text style={styles.sectionTotal}>Libros: {data.length}</Text>
               </View>
-            );
-          })
-        )}
-      </ScrollView>
+              {recentBooks.length > 0 && (
+                <BookList
+                  noFlex
+                  title="Recientes"
+                  items={recentBooks}
+                  handleBook={handleBook}
+                  isRecentList
+                />
+              )}
+              <BookList
+                title={recentBooks.length > 0 ? 'Libros' : undefined}
+                items={sortingData()}
+                handleBook={handleBook}
+              />
+            </>
+          )}
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  main: {
+  flex1: {
     flex: 1,
+  },
+  row: {
+    height: 90,
   },
   container: {
     flex: 1,
@@ -115,9 +103,8 @@ const styles = StyleSheet.create({
   },
   column: {
     flex: 1,
+    height: 60,
     flexDirection: 'row',
-    alignContent: 'center',
-    alignItems: 'center',
     justifyContent: 'space-between',
   },
   errorText: {
@@ -125,11 +112,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginVertical: 10,
-  },
   sectionTotal: {
     fontSize: 16,
     fontWeight: 'bold',

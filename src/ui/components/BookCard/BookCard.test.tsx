@@ -4,17 +4,24 @@ import {ReactTestInstance} from 'react-test-renderer';
 
 import {BOOK_MOCKED} from '@testUtils/index';
 import {BookCard} from './BookCard';
+import {ViewToken} from 'react-native';
+import {Book} from '@core/Book';
+import {SharedValue, useSharedValue} from 'react-native-reanimated';
+import {BooksContext} from 'ui/contexts/BooksContext';
 
 describe(BookCard, () => {
   let titleNode: ReactTestInstance;
   it('Should render an image along a title', async () => {
     const mockJestFn = jest.fn();
+    const mockToken: SharedValue<ViewToken<Book>[]> = useSharedValue<
+      ViewToken<Book>[]
+    >([]);
 
     render(
       <BookCard
+        viewableItems={mockToken}
         book={BOOK_MOCKED}
         isRecent={false}
-        isFavorite={false}
         handleBook={mockJestFn}
       />,
     );
@@ -31,14 +38,27 @@ describe(BookCard, () => {
 
   it('Should show a star icon if it is favorite', async () => {
     const mockJestFn = jest.fn();
-
+    const mockToken: SharedValue<ViewToken<Book>[]> = useSharedValue<
+      ViewToken<Book>[]
+    >([]);
     render(
-      <BookCard
-        book={BOOK_MOCKED}
-        isRecent={false}
-        isFavorite
-        handleBook={mockJestFn}
-      />,
+      <BooksContext.Provider
+        value={{
+          recents: [],
+          favorites: [],
+          addRecent: () => {},
+          toggleFavorites: () => {},
+          isFavorite: _ => true,
+          isSortingAsc: true,
+          onSort: () => {},
+        }}>
+        <BookCard
+          book={BOOK_MOCKED}
+          isRecent={false}
+          viewableItems={mockToken}
+          handleBook={mockJestFn}
+        />
+      </BooksContext.Provider>,
     );
     const starIcon = screen.getByText('★');
     expect(starIcon).toBeOnTheScreen();
@@ -47,11 +67,14 @@ describe(BookCard, () => {
 
   it('Should handle method when press over the card', async () => {
     const mockJestFn = jest.fn();
+    const mockToken: SharedValue<ViewToken<Book>[]> = useSharedValue<
+      ViewToken<Book>[]
+    >([]);
     render(
       <BookCard
         book={BOOK_MOCKED}
         isRecent={false}
-        isFavorite
+        viewableItems={mockToken}
         handleBook={mockJestFn}
       />,
     );

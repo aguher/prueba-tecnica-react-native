@@ -19,8 +19,8 @@ export const UpdateBooks = ({
 const styles = StyleSheet.create({
   searchButton: {
     backgroundColor: 'transparent',
-    padding: 10,
+    padding: 0,
+    height: 20,
     alignItems: 'center',
-    marginBottom: 16,
   },
 });
